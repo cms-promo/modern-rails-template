@@ -1,16 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title><%= Rails.application.class.parent_name %></title>
+    <!-- Standard Meta -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="application-name" content="<%= Rails.application.class.parent_name %>" />
+    <meta property="fb:app_id" content="261955177296268" />
+    <%= display_meta_tags site: Rails.application.class.parent_name, reverse: true,
+        viewport: "width=device-width, initial-scale=1",
+        "mobile-web-app-capable": "yes" %>
     <%= csrf_meta_tags %>
-    <%= action_cable_meta_tag %>
-    <%= stylesheet_pack_tag 'application', media: 'all' %>
+    <%= csp_meta_tag %>
+
+    <% if content_for?(:layout_assets) %>
+      <%= yield :layout_assets %>
+    <% else %><!-- Fallback to basic application assets -->
+      <%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+      <%= javascript_pack_tag 'application', defer: 'defer', 'data-turbolinks-track': 'reload' %>
+    <% end %>
+    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+    <%= javascript_include_tag 'application', defer: 'defer', 'data-turbolinks-track': 'reload' %>
+
   </head>
   <body>
     <%= yield %>
-    <%= javascript_include_tag 'application' %>
-    <%= javascript_pack_tag 'application' %>
   </body>
 </html>

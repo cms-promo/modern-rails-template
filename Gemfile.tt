@@ -13,7 +13,7 @@ gem 'webpacker'
 
 gem 'jbuilder'<%= gemfile_requirement('jbuilder') %>
 gem 'redis'<%= gemfile_requirement('redis') %>
-gem 'turbolinks'<%= gemfile_requirement('turbolinks') %>
+#gem 'turbolinks'<%= gemfile_requirement('turbolinks') %>
 
 gem 'bootsnap', '>= 1.1.0', require: false
 
@@ -21,6 +21,22 @@ gem 'rails-i18n'
 
 gem 'sidekiq'
 gem 'sidekiq-failures'
+
+# CUSTOMIZATION
+gem 'acts-as-taggable-on'
+gem 'decorators'
+gem 'meta-tags'
+gem 'plissken'
+gem 'ransack'
+
+# OPTIMIZATION
+gem 'rack-mini-profiler'
+gem 'flamegraph'
+gem 'stackprof' # ruby 2.1+ only
+gem 'memory_profiler'
+
+# SUPPORT friendly_id
+gem 'babosa'
 
 gem 'friendly_id'
 

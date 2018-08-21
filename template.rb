@@ -81,10 +81,12 @@ def ask_optional_options
   @devise = yes?('Do you want to implement authentication in your app with the Devise gem?')
   @pundit = yes?('Do you want to manage authorizations with Pundit?') if @devise
   @uuid = yes?('Do you want to use UUID for active record primary?')
-  @haml = yes?('Do you want to use Haml instead of EBR?')
+  #@haml = yes?('Do you want to use Haml instead of EBR?')
+  @slim = yes?('Do you want to use Slim instead of ERB?')
   @komponent = yes?('Do you want to adopt a component based design for your front-end?')
   @tailwind = yes?('Do you want to use Tailwind as a CSS framework?')
-  @github = yes?('Do you want to push your project to Github?')
+  #@github = yes?('Do you want to push your project to Github?')
+  @promo = yes?('Do you want to use cms-promo?')
 end
 
 def install_optional_gems
@@ -92,6 +94,8 @@ def install_optional_gems
   add_pundit if @pundit
   add_komponent if @komponent
   add_haml if @haml
+  add_slim if @slim
+  add_promo if @promo
 end
 
 def add_devise
@@ -108,11 +112,21 @@ def add_haml
   insert_into_file 'Gemfile', "gem 'haml-rails', git: 'git://github.com/indirect/haml-rails.git'\n", after: /'friendly_id'\n/
 end
 
-def add_komponent
-  insert_into_file 'Gemfile', "gem 'komponent'\n", after: /'friendly_id'\n/
+def add_slim
+  insert_into_file 'Gemfile', "gem 'slim'\n", after: /'friendly_id'\n/
+  insert_into_file 'Gemfile', "gem 'slim-rails'\n", after: /'friendly_id'\n/
 end
 
+def add_komponent
+  insert_into_file 'Gemfile', "gem 'komponent'\n", after: /'friendly_id'\n/
+  #insert_into_file 'Gemfile', "gem 'komponent', git: 'git://github.com/komposable/komponent.git'\n", after: /'friendly_id'\n/
+end
 
+def add_promo
+  insert_into_file 'Gemfile', "gem 'cells'\n", after: /'friendly_id'\n/
+  insert_into_file 'Gemfile', "gem 'comfortable_mexican_sofa', '~> 2.0.0'\n", after: /'friendly_id'\n/
+  insert_into_file 'Gemfile', "gem 'promo', github: 'cms-promo/promo'\n", after: /'friendly_id'\n/
+end
 
 def setup_uuid
   copy_file 'db/migrate/20180208061510_enable_pg_crypto_extension.rb'
@@ -167,9 +181,11 @@ def setup_gems
   setup_brakeman
   setup_guard
   setup_komponent if @komponent
+  setup_promo if @promo
   setup_devise if @devise
   setup_pundit if @pundit
   setup_haml if @haml
+  setup_slim if @slim
 end
 
 def setup_friendly_id
@@ -230,6 +246,7 @@ end
 
 def install_komponent
   run 'rails g komponent:install --stimulus'
+  FileUtils.cp_r 'app/javascript/.', 'frontend'
   insert_into_file 'config/initializers/generators.rb', "  g.komponent stimulus: true, locale: true\n", after: /assets: false\n/
   FileUtils.rm_rf 'app/javascript'
   insert_into_file 'app/controllers/application_controller.rb', "  prepend_view_path Rails.root.join('frontend')\n", after: /exception\n/
@@ -255,7 +272,7 @@ def setup_devise
   insert_into_file 'config/initializers/devise.rb', "  config.secret_key = Rails.application.credentials.secret_key_base\n", before: /^end/
   run 'rails g devise User'
   insert_into_file 'app/controllers/application_controller.rb', "  before_action :authenticate_user!\n", after: /exception\n/
-  insert_into_file 'app/controllers/pages_controller.rb', "  skip_before_action :authenticate_user!, only: :home\n", after: /ApplicationController\n/
+#  insert_into_file 'app/controllers/pages_controller.rb', "  skip_before_action :authenticate_user!, only: :home\n", after: /ApplicationController\n/
 end
 
 def setup_pundit
@@ -291,7 +308,15 @@ def setup_haml
   run 'HAML_RAILS_DELETE_ERB=true rake haml:erb2haml'
 end
 
+def setup_slim
+  run 'gem install html2slim'
+  run 'erb2slim app/views --delete'
+end
 
+def setup_promo
+  run 'rails active_storage:install'
+  run 'rails generate comfy:cms'
+end
 
 def setup_git
   git flow: 'init -d'
